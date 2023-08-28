@@ -3,7 +3,7 @@
 var gl;
 var points;
 
-var NumPoints = 5000000;
+var NumPoints = 100;
 
 window.onload = function init()
 {
@@ -20,7 +20,7 @@ window.onload = function init()
 
     var vertices = [
         vec2( -1, -1 ),
-        vec2(  0,  1 ),
+        vec2(  100,  100 ),
         vec2(  1, -1 )
     ];
 
