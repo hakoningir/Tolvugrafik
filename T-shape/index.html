@@ -2,16 +2,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
-<title>2D Sierpinski Gasket</title>
-
 <script id="vertex-shader" type="x-shader/x-vertex">
 attribute vec4 vPosition;
 
 void
 main()
 {
-	gl_PointSize = 3.0;
     gl_Position = vPosition;
 }
 </script>
@@ -26,10 +22,9 @@ main()
 }
 </script>
 
-<script type="text/javascript" src="/webGL/Common/webgl-utils.js"></script>
-<script type="text/javascript" src="/webGL/Common/initShaders.js"></script>
-<script type="text/javascript" src="/webGL/Common/MV.js"></script>
-<script type="text/javascript" src="/webGL/gasket1.js"></script>
+<script type="text/javascript" src="/Sierpinski/webGL/Common/webgl-utils.js"></script>
+<script type="text/javascript" src="/Sierpinski/webGL/Common/initShaders.js"></script>
+<script type="text/javascript" src="/T-shape/T-shape-fan.js"></script>
 </head>
 
 <body>
