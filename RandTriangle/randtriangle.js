@@ -1,5 +1,4 @@
 var gl;
-// var triangle;
 let vertices = [];
 var colorLoc;
 
@@ -10,7 +9,7 @@ window.onload = function init()
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
 
-    for(let i = 0; i <= 100; i++){
+    for(let i = 0; i < 100; i++){
         vertices.push(vec2(-0.1, 0),
                       vec2(0.1, 0),
                       vec2(0, 0.1));
@@ -22,13 +21,6 @@ window.onload = function init()
 
     // triangle = [t]
 
-    for (let i = 0; i <= vertices.length; i += 6){
-        var x = Math.random()
-        var y = Math.random()
-        vertices[i]+=x, vertices[i+2]+=x, vertices[i+4]+=x;
-        vertices[i+1]+=y, vertices[i+3]+=y, vertices[i+5]+=y;
-        //færa alla punkta um randomtölu á bilinu -1 og 1
-    }
     //
     //  Configure WebGL
     //
@@ -52,17 +44,30 @@ window.onload = function init()
     gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vPosition );
 
-    // Find the location of the variable fColor in the shader program
-    colorLoc = gl.getUniformLocation( program, "uni" );
-    
+    // Find the location of the variables colors and offset in the shader program
+    colorLoc = gl.getUniformLocation( program, "colors" );
+    offsetLoc = gl.getUniformLocation( program, "offset" );
+    console.log(vertices);
     render();
 };
 
 
 function render() {
     gl.clear( gl.COLOR_BUFFER_BIT );
-    for(let i = 0; i < 100; i++){
-        gl.uniform4fv( colorLoc, vec4(Math.random(), Math.random(), Math.random(), Math.random()) );
+    for (let i = 0; i <= vertices.length; i += 3){
+        var x = Math.random();
+        var y = Math.random();
+        vertices[i.x]+=x; 
+        vertices[i.y]+=y; 
+        vertices[(i+1).x]+=x; 
+        vertices[(i+1).y]+=y; 
+        vertices[(i+2).x]+=x; 
+        vertices[(i+2).y]+=y; 
+        //færa alla punkta um randomtölu á bilinu 0 og 1
+    }
+    for(let i = 0; i < 100; i+=3){
+        gl.uniform4fv( colorLoc, vec4(Math.random(), Math.random(), Math.random(), 1) );
+        gl.uniform2fv( offsetLoc, vertices );
         gl.drawArrays( gl.TRIANGLES, 0, vertices.length );   
     }
 }
