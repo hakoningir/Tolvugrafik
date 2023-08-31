@@ -64,7 +64,7 @@ window.onload = function init()
 function render() {
     gl.clear( gl.COLOR_BUFFER_BIT );
 
-    for(let i = 0; i < 100; i+=3){
+    for(let i = 0; i < 300; i+=3){
         console.log(vertices);
         gl.uniform4fv( colorLoc, vec4(Math.random(), Math.random(), Math.random(), 1) );
         
