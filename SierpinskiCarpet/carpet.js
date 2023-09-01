@@ -17,8 +17,8 @@ function divide( a, b, c, d, count){
 
     // pusha miðjunni 5
     vertices.push(
-        [a[0]+x/3, a[1]-y/3], 
         [b[0]+x/3, b[1]+y/3], 
+        [a[0]+x/3, a[1]-y/3], 
         [c[0]-x/3, c[1]-y/3], 
         [d[0]-x/3, d[1]+y/3], 
         );
@@ -106,8 +106,10 @@ function divide( a, b, c, d, count){
         vec2(  1,  1 ),
     ];
     divide(box[0], box[1], box[3], box[2], 4);
+    
+    // divide(box[4], box[5], box[7], box[6], 4);
 
-
+    
     //
     //  Configure WebGL
     //
@@ -138,14 +140,14 @@ function divide( a, b, c, d, count){
 
 
 function render() {
+    gl.clearColor(1,0,0,1);
     gl.clear( gl.COLOR_BUFFER_BIT );
-    gl.uniform2fv(offsetLoc, box);
-    console.log(box);
+    
     gl.uniform4fv( colorLoc, vec4(1, 0, 0, 1));
+    gl.uniform2fv(offsetLoc, box);
     gl.drawArrays( gl.TRIANGLE_FAN, 0, 4 );
-    console.log(vertices);
-    for(let i = 4; i < vertices.length; i+=4){
-        gl.uniform4fv( colorLoc, vec4(0, 0, 0, 1));
+    for(let i = 0; i < vertices.length; i+=4){
+        gl.uniform4fv( colorLoc, vec4(0, 0, 0, 0));
         gl.uniform2fv( offsetLoc, vertices[i]);
         gl.drawArrays(gl.TRIANGLE_FAN, i, 4);
     }
