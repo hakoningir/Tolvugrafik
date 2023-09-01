@@ -56,7 +56,6 @@ window.onload = function init()
 
     // Find the location of the variables colors and offset in the shader program
     colorLoc = gl.getUniformLocation( program, "colors" );
-    offsetLoc = gl.getUniformLocation( program, "offset" );
     render();
 };
 
@@ -65,10 +64,8 @@ function render() {
     gl.clear( gl.COLOR_BUFFER_BIT );
 
     for(let i = 0; i < 300; i+=3){
-        console.log(vertices);
         gl.uniform4fv( colorLoc, vec4(Math.random(), Math.random(), Math.random(), 1) );
         
-        gl.uniform2fv( offsetLoc, vertices );
         gl.drawArrays( gl.TRIANGLES, i, 3 );   
     }
 }

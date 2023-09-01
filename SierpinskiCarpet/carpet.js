@@ -1,6 +1,5 @@
 var gl;
 var colorLoc;
-var offsetLoc;
 var box = [];
 var vertices = [];
 
@@ -10,19 +9,20 @@ function divide( a, b, c, d, count){
     // count til að fara úr endurkvæmni
     count--;
     
-    // Margfalda x y location með 1/3 til þess að fá vinstri hlið, leggja 1/3 af því við til að fá hægri hlið
     // Er með hnit a=topleft, b=bottomleft, c=topright, d=bottomleft
+    // Tek lengd frá a til c fyrir x og a til b fyrir y og legg það og dreg frá þar sem er viðeigandi
+    // dreg frá þegar x eða y > 0 en legg við þegar x eða y < 0
     let x = c[0]-a[0]; 
     let y = a[1]-b[1];
 
-    // pusha miðjunni 5
+    // pusha miðjunni
     vertices.push(
         [b[0]+x/3, b[1]+y/3], 
         [a[0]+x/3, a[1]-y/3], 
         [c[0]-x/3, c[1]-y/3], 
         [d[0]-x/3, d[1]+y/3], 
         );
-    // topleft 1
+    // topleft 
     divide(
         [a[0],a[1]],
         [a[0],a[1]-y/3],
@@ -30,7 +30,7 @@ function divide( a, b, c, d, count){
         [a[0]+x/3,a[1]-y/3], 
         count);
         
-    // middleleft 4
+    // middleleft 
     divide(
         [a[0], a[1]-y/3],
         [b[0], b[1]+y/3], 
@@ -38,7 +38,7 @@ function divide( a, b, c, d, count){
         [b[0]+x/3,b[1]+y/3], 
         count);
         
-    // bottomleft 7
+    // bottomleft 
     divide(
         [b[0], b[1]+y/3], 
         [b[0], b[1]], 
@@ -46,7 +46,7 @@ function divide( a, b, c, d, count){
         [b[0]+x/3, b[1]], 
         count);
         
-    // middletop 2
+    // middletop
     divide(
         [a[0]+x/3,a[1]], 
         [a[0]+x/3,a[1]-y/3], 
@@ -54,7 +54,7 @@ function divide( a, b, c, d, count){
         [c[0]-x/3, c[1]-y/3], 
         count);
         
-    // middlebottom 8
+    // middlebottom 
     divide(
         [b[0]+x/3,b[1]+y/3], 
         [b[0]+x/3,b[1]], 
@@ -62,7 +62,7 @@ function divide( a, b, c, d, count){
         [d[0]-x/3, d[1]], 
         count);
         
-    // topright 3
+    // topright
     divide(
         [c[0]-x/3, c[1]], 
         [c[0]-x/3, c[1]-y/3], 
@@ -70,7 +70,7 @@ function divide( a, b, c, d, count){
         [c[0], c[1]-y/3], 
         count);
     
-    // middleright 6
+    // middleright
     divide(
         [c[0]-x/3, [c[1]-y/3]], 
         [d[0]-x/3,d[1]+y/3], 
@@ -78,7 +78,7 @@ function divide( a, b, c, d, count){
         [d[0], d[1]+y/3], 
         count);
         
-    // bottomright 9
+    // bottomright
     divide(
         [d[0]-x/3,d[1]+y/3], 
         [d[0]-x/3,d[1]], 
@@ -107,8 +107,6 @@ function divide( a, b, c, d, count){
     ];
     divide(box[0], box[1], box[3], box[2], 4);
     
-    // divide(box[4], box[5], box[7], box[6], 4);
-
     
     //
     //  Configure WebGL
@@ -134,7 +132,6 @@ function divide( a, b, c, d, count){
     gl.enableVertexAttribArray( vPosition );
 
     colorLoc = gl.getUniformLocation( program, "colors" );
-    offsetLoc = gl.getUniformLocation( program, "offset");
     render();
 };
 
@@ -142,13 +139,8 @@ function divide( a, b, c, d, count){
 function render() {
     gl.clearColor(1,0,0,1);
     gl.clear( gl.COLOR_BUFFER_BIT );
-    
-    gl.uniform4fv( colorLoc, vec4(1, 0, 0, 1));
-    gl.uniform2fv(offsetLoc, box);
-    gl.drawArrays( gl.TRIANGLE_FAN, 0, 4 );
     for(let i = 0; i < vertices.length; i+=4){
         gl.uniform4fv( colorLoc, vec4(0, 0, 0, 0));
-        gl.uniform2fv( offsetLoc, vertices[i]);
         gl.drawArrays(gl.TRIANGLE_FAN, i, 4);
     }
 }
