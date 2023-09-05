@@ -1,0 +1,37 @@
+
+<!DOCTYPE html>
+<html>
+<script id="vertex-shader" type="x-shader/x-vertex">
+attribute vec4 vPosition;
+uniform vec2 frog;
+
+void
+main()
+{
+    gl_Position = vPosition;
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+precision mediump float;
+uniform vec4 colorFrog;
+
+void
+main()
+{
+    gl_FragColor = colorFrog;
+}
+</script>
+
+<script type="text/javascript" src="/Sierpinski/webGL/Common/webgl-utils.js"></script>
+<script type="text/javascript" src="/Sierpinski/webGL/Common/initShaders.js"></script>
+<script type="text/javascript" src="/Sierpinski/webGL/Common/MV.js"></script>
+<script type="text/javascript" src="/Frogger/frogger.js"></script>
+
+<body>
+<canvas id="gl-canvas" width="512" height="512">
+Oops ... your browser doesn't support the HTML5 canvas element
+</canvas>
+<a href="/..">Til baka</a>
+</body>
+</html>
