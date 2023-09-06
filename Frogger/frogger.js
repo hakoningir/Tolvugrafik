@@ -1,6 +1,14 @@
 var canvas;
 var gl;
 
+var a = vec2( 0,   -0.8 );
+var b = vec2(-0.1, -0.9 );
+var c = vec2( 0.1, -0.9 );
+var vertices = [a,b,c];
+var theta = 1.5708;
+var x0 = (a[0]+b[0]+c[0])/3;
+var y0 = (a[1]+b[1]+c[1])/3;
+
 window.onload = function init() {
 
     canvas = document.getElementById( "gl-canvas" );
@@ -8,18 +16,6 @@ window.onload = function init() {
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
 
-    var vertices = [
-        vec2( 0,   -0.8 ),
-        vec2(-0.1, -0.9 ),
-        vec2( 0.1, -0.9 ),
-    ];
-    
-    // var vertices = [
-    //     vec2( 0,   -0.85 ),
-    //     vec2( 0.1, -0.8  ),
-    //     vec2( 0.1, -0.9  ),
-    // ];
-    
     gl.viewport( 0, 0, canvas.width, canvas.height );
     gl.clearColor( 0.8, 0.8, 0.8, 1.0 );
 
@@ -43,62 +39,92 @@ window.onload = function init() {
     frogLoc = gl.getUniformLocation( program, "frog" );
     color = gl.getUniformLocation(program, "colorFrog");
 
-    var step = 0.2;
-
-    /* var vertices = [
-         vec2(  0, -0.85 ) ,
-         vec2(  0.1, -0.8 ),
-         vec2( 0.1, -0.9 ),
-     ];
-        vec2(  0,   -0.8 ) ,
-        vec2(  0.1, -0.9 ),
-        vec2( -0.1, -0.9 ),     
-    */
+    const step = 0.1;
+    var dir = 1;
     // Event listener for keyboard
     window.addEventListener("keydown", (e) => {
-        if(e.code == "ArrowLeft")           // left
+        if(e.code == "ArrowUp"){
+            if(dir == 2){// var að benda hægri
+                vertices[2][0] = vertices[1][0]+0.2
+                vertices[2][1] = vertices[1][1]
+            }
+            else if(dir == 3){// var að benda niður
+                vertices[0][1] += 0.1;
+                vertices[1][1] -= 0.1;
+                vertices[2][1] -= 0.1;
+            }
+            else if(dir == 4){// var að benda vinstri
+                vertices[1][0] = vertices[2][0]-0.2
+                vertices[1][1] = vertices[2][1]
+            }
+            for(let i = 0; i<3; i++) {
+                vertices[i][1] += step
+            }
+            dir = 1
+        }
+        else if(e.code == "ArrowRight") {
+            if(dir == 1){// var að benda upp
+                vertices[2][0] = vertices[1][0]
+                vertices[2][1] = vertices[1][1]+0.2
+            }
+            else if (dir == 3){// var að benda niður
+                vertices[2][0] = vertices[1][0]
+                vertices[2][1] = vertices[1][1]-0.2
+            }
+            else if(dir == 4){// var að benda vinstri
+                vertices[0][0] += 0.1;
+                vertices[1][0] -= 0.1;
+                vertices[2][0] -= 0.1;
+            }
+            for(let i = 0; i<3; i++) {
+                vertices[i][0] += step 
+            }
+            dir = 2
+        }
+        else if(e.code == "ArrowDown"){
+            if(dir == 1){// var að benda upp
+                vertices[0][1] -= 0.1;
+                vertices[1][1] += 0.1;
+                vertices[2][1] += 0.1;
+            }
+            else if(dir == 2){// var að benda hægri
+                vertices[1][0] = vertices[2][0]+0.2
+                vertices[1][1] = vertices[2][1]
+            }
+            else if(dir == 4){// var að benda vinstri
+                vertices[2][0] = vertices[1][0]-0.2
+                vertices[2][1] = vertices[1][1]
+            }
+            for(let i = 0; i<3; i++) {
+                vertices[i][1] -= step
+            }
+            dir = 3
+        }
+        else if(e.code == "ArrowLeft"){
+            if (dir == 1){ // var að benda upp
+                vertices[1][0] = vertices[2][0]
+                vertices[1][1] = vertices[2][1]+0.2
+            }
+            else if(dir == 2){// var að benda hægri
+                vertices[0][0] -= 0.1;
+                vertices[1][0] += 0.1;
+                vertices[2][0] += 0.1;
+            }
+            else if(dir == 3){// var að benda niður
+                vertices[2][0] = vertices[1][0]
+                vertices[2][1] = vertices[1][1]-0.2
+            }
             for(let i = 0; i<3; i++) {
                 vertices[i][0] -= step;
-                vertices = turnleft(vertices);
             }
-        else if(e.code == "ArrowUp")        // up
-            for(let i = 0; i<3; i++) vertices[i][1] += step;
-        else if(e.code == "ArrowRight")     // right
-            for(let i = 0; i<3; i++) vertices[i][0] += step;
-        else if(e.code == "ArrowDown")      // down
-            for(let i = 0; i<3; i++) vertices[i][1] -= step;
-        console.log(e.code);
+            dir = 4
+        }
+        console.log(dir)
         console.log(vertices);
         
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(vertices));
     });
     render();
-}
-/* var vertices = [
-     vec2(  0, -0.85 ) ,
-     vec2(  0.1, -0.8 ),
-     vec2( 0.1, -0.9 ),
- ];
-    vec2(  0,   -0.8 ) ,
-    vec2(  0.1, -0.9 ),
-    vec2( -0.1, -0.9 ),
-*/
-var theta = 0.1
-function turnleft(vertices){
-    var ax = vertices[0][0];
-    var ay = vertices[0][1];
-    var rotateX = ax*Math.cos(theta) + ay * (-Math.sin(theta)) + ax
-    var bx = vertices[1][0];
-    var by = vertices[1][1]+0.2;
-    var cx = vertices[1][0];
-    var cy = vertices[1][1];
-    // var ax = bx-0.2;
-    var ay = cy-0.1;
-    return [ //lífið fokking sökkar ég hata þetta drasl, afh er ekki bara rotate fall
-        vec2(ax, ay), 
-        vec2(bx, by),
-        vec2(rotateX, cy), 
-    ]
 }
 
 function render() {
