@@ -1,13 +1,19 @@
 var canvas;
 var gl;
-
-var a = vec2( 0,   -0.8 );
-var b = vec2(-0.1, -0.9 );
-var c = vec2( 0.1, -0.9 );
-var vertices = [a,b,c];
-var theta = 1.5708;
-var x0 = (a[0]+b[0]+c[0])/3;
-var y0 = (a[1]+b[1]+c[1])/3;
+var bufferIda;
+var colorA = vec4(0,0,0,1);
+var bufferIdb;
+var colorB = vec4(1,0,0,1);
+var bufferIdc;
+var colorC = vec4(0,1,0,1)
+var vPosition;
+var vertices = [
+    vec2( 0,   -0.8 ),
+    vec2( 0.1, -0.9 ),
+    vec2(-0.1, -0.9 )];
+var sideWalk = [];
+var cars = [];
+var color;
 
 window.onload = function init() {
 
@@ -15,7 +21,27 @@ window.onload = function init() {
     
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
-
+    
+    sideWalk = [
+        vec2(-1, -1),
+        vec2(-1, -0.7),
+        vec2(1, -1),
+        vec2(1, -0.7),
+        vec2(1, -0.1),  
+        vec2(1, 0.1),  
+        vec2(-1, -0.1),  
+        vec2(-1, 0.1),  
+        vec2(-1, 1),
+        vec2(-1, 0.7),
+        vec2(1, 1),
+        vec2(1, 0.7), 
+    ];
+    cars = [
+        vec2(0.9, 0),
+        vec2(0.9, 0),
+        vec2(0.7, 0.2),
+        vec2(0.7, 0.2),
+    ];
     gl.viewport( 0, 0, canvas.width, canvas.height );
     gl.clearColor( 0.8, 0.8, 0.8, 1.0 );
 
@@ -26,101 +52,62 @@ window.onload = function init() {
     gl.useProgram( program );
     
     // Load the data into the GPU
-    var bufferId = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, bufferId );
+    bufferIda = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, bufferIda );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(sideWalk), gl.STATIC_DRAW );
+    
+    bufferIdb = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, bufferIdb );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(cars), gl.STATIC_DRAW );
+
+    bufferIdc = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, bufferIdc );
     gl.bufferData( gl.ARRAY_BUFFER, flatten(vertices), gl.DYNAMIC_DRAW );
 
     // Associate out shader variables with our data buffer
-    var vPosition = gl.getAttribLocation( program, "vPosition" );
+    vPosition = gl.getAttribLocation( program, "vPosition" );
     gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vPosition );
 
     // uniform breytur
-    frogLoc = gl.getUniformLocation( program, "frog" );
     color = gl.getUniformLocation(program, "colorFrog");
 
     const step = 0.1;
     var dir = 1;
     // Event listener for keyboard
     window.addEventListener("keydown", (e) => {
-        if(e.code == "ArrowUp"){
-            if(dir == 2){// var að benda hægri
-                vertices[2][0] = vertices[1][0]+0.2
-                vertices[2][1] = vertices[1][1]
-            }
-            else if(dir == 3){// var að benda niður
+        if(e.code == "ArrowUp" && vertices[0][1]+step <= 1){
+            if(dir == 2){// var að benda niður
                 vertices[0][1] += 0.1;
                 vertices[1][1] -= 0.1;
                 vertices[2][1] -= 0.1;
-            }
-            else if(dir == 4){// var að benda vinstri
-                vertices[1][0] = vertices[2][0]-0.2
-                vertices[1][1] = vertices[2][1]
             }
             for(let i = 0; i<3; i++) {
                 vertices[i][1] += step
             }
             dir = 1
         }
-        else if(e.code == "ArrowRight") {
-            if(dir == 1){// var að benda upp
-                vertices[2][0] = vertices[1][0]
-                vertices[2][1] = vertices[1][1]+0.2
-            }
-            else if (dir == 3){// var að benda niður
-                vertices[2][0] = vertices[1][0]
-                vertices[2][1] = vertices[1][1]-0.2
-            }
-            else if(dir == 4){// var að benda vinstri
-                vertices[0][0] += 0.1;
-                vertices[1][0] -= 0.1;
-                vertices[2][0] -= 0.1;
-            }
+        else if(e.code == "ArrowRight" && vertices[0][0]+step <= 1) {
             for(let i = 0; i<3; i++) {
                 vertices[i][0] += step 
             }
-            dir = 2
         }
-        else if(e.code == "ArrowDown"){
+        else if(e.code == "ArrowDown" && vertices[0][1]-step >= -1){
             if(dir == 1){// var að benda upp
                 vertices[0][1] -= 0.1;
                 vertices[1][1] += 0.1;
                 vertices[2][1] += 0.1;
             }
-            else if(dir == 2){// var að benda hægri
-                vertices[1][0] = vertices[2][0]+0.2
-                vertices[1][1] = vertices[2][1]
-            }
-            else if(dir == 4){// var að benda vinstri
-                vertices[2][0] = vertices[1][0]-0.2
-                vertices[2][1] = vertices[1][1]
-            }
             for(let i = 0; i<3; i++) {
                 vertices[i][1] -= step
             }
-            dir = 3
+            dir = 2
         }
-        else if(e.code == "ArrowLeft"){
-            if (dir == 1){ // var að benda upp
-                vertices[1][0] = vertices[2][0]
-                vertices[1][1] = vertices[2][1]+0.2
-            }
-            else if(dir == 2){// var að benda hægri
-                vertices[0][0] -= 0.1;
-                vertices[1][0] += 0.1;
-                vertices[2][0] += 0.1;
-            }
-            else if(dir == 3){// var að benda niður
-                vertices[2][0] = vertices[1][0]
-                vertices[2][1] = vertices[1][1]-0.2
-            }
+        else if(e.code == "ArrowLeft" && vertices[0][0]-step >= -1){
             for(let i = 0; i<3; i++) {
                 vertices[i][0] -= step;
             }
-            dir = 4
         }
-        console.log(dir)
-        console.log(vertices);
         
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(vertices));
     });
@@ -129,8 +116,29 @@ window.onload = function init() {
 
 function render() {
     gl.clear( gl.COLOR_BUFFER_BIT );
-    gl.uniform4fv(color, vec4(0,1,0,1));
-    gl.drawArrays( gl.TRIANGLES, 0, 3 );
+    
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufferIda);
+    gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0,0);
+    for(let i = 0; i < sideWalk.length; i+=4){
+        gl.uniform4fv(color, flatten(colorA));
+        gl.drawArrays( gl.TRIANGLE_STRIP, i, 4);
+    }
 
+
+    gl.bindBuffer( gl.ARRAY_BUFFER, bufferIdb);
+    gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0,0);
+    gl.uniform4fv(color, flatten(colorB));
+    gl.drawArrays( gl.TRIANGLE_FAN, 0, 4);
+    // for(let i = 0; i < cars.length; i+=4){
+    //     gl.uniform4fv(color, vec4(Math.random(),Math.random(),Math.random(),1));
+    //     gl.drawArrays( gl.TRIANGLE_STRIP, i, 4);
+    // }
+
+
+    gl.bindBuffer( gl.ARRAY_BUFFER, bufferIdc);
+    gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0,0);
+    gl.uniform4fv(color, flatten(colorC));
+    gl.drawArrays( gl.TRIANGLES, 0, 3 );
+ 
     window.requestAnimationFrame(render);
 }
