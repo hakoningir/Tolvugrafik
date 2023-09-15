@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <script id="vertex-shader" type="x-shader/x-vertex">
@@ -13,12 +12,12 @@ main()
 
 <script id="fragment-shader" type="x-shader/x-fragment">
 precision mediump float;
-uniform vec4 colorFrog;
+uniform vec4 color;
 
 void
 main()
 {
-    gl_FragColor = colorFrog;
+    gl_FragColor = color;
 }
 </script>
 
