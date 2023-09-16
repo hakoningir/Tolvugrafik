@@ -15,27 +15,7 @@ var sideWalk = [];
 var cars = [];
 var color;
 var carsInRow = 3;
-
-//     for(let i = 0; i<cars.length; i+=6){
-//         if( cars[i][0] + offset < -1.3 ) { 
-//             cars[i][0] = cars[i][0]+2.3
-//             cars[i+1][0] = cars[i+1][0]+2.3
-//             cars[i+2][0] = cars[i+2][0]+2.3
-//             cars[i+3][0] = cars[i+3][0]+2.3
-//             cars[i+4][0] = cars[i+4][0]+2.3
-//             cars[i+5][0] = cars[i+5][0]+2.3
-//         }
-//         if( cars[i][0] - offset > 1.3 ) {
-//             cars[i][0] = cars[i][0]-2.3
-//             cars[i+1][0] = cars[i+1][0]-2.3
-//             cars[i+2][0] = cars[i+2][0]-2.3
-//             cars[i+3][0] = cars[i+3][0]-2.3
-//             cars[i+4][0] = cars[i+4][0]-2.3
-//             cars[i+5][0] = cars[i+5][0]-2.3
-//         }
-//     }
-//     return cars;
-// }
+var collision = false;
 function generateCars(){
     for(let i = 0; i < carsInRow; i++){
         cars.push(
@@ -92,7 +72,7 @@ function generateCars(){
 
 function moveCars(offset){
     var carDir = 1;
-    // var speed = [1, 1.2, 1.6, 2, 1.3, 1.9];
+    // var speed = [1, 1, 1, 1.2,1.2,1.2, 1.6,1.6,1.6, 2,2,2, 1.3,1.3,1.3, 1.9,1.9,1.9];
     // var counter = 0;
     for(let i = 0; i<cars.length; i++) {
         if(i % 6 == 0){
@@ -123,11 +103,20 @@ function moveCars(offset){
 }
 
 function collisionDetection(){
-    for(var i = 0; i < cars.length; i++){
+    var carWidth = 0.2;
+    var carHeight = 0.08;
+    var frogWidth = 0.2;
+    var frogHeight= 0.1;
+    for(var i = 0; i < cars.length; i+=6){
         for(var j = 0; j < frogLoc.length; j++){
-            if(cars[i][0] == frogLoc[j][0]){
-                console.log("dead");
-                return true
+            for(var k = 0; k < 6; k++){
+                if( cars[i][0] <= frogLoc[j][0] + frogWidth  && 
+                    cars[i][0] + carWidth >= frogLoc[j][0]  && 
+                    cars[i][1] <= frogLoc[j][1] + frogHeight && 
+                    cars[i][1] + carHeight >= frogLoc[j][1]) {
+                    console.log("dead");
+                    collision =  true;
+                }
             }
         }
     }
@@ -248,13 +237,14 @@ function render() {
     gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0,0);
     gl.uniform4fv(color, flatten(colorCars));
     gl.drawArrays( gl.TRIANGLES, 0, cars.length );
-    collisionDetection()
+
     //frogBuffer
     gl.bindBuffer( gl.ARRAY_BUFFER, frogBuffer);
     gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0,0);
     gl.uniform4fv(color, flatten(colorFrog));
     gl.drawArrays( gl.TRIANGLES, 0, 3 );
 
+    collisionDetection()
 
     window.requestAnimationFrame(render);
 }
