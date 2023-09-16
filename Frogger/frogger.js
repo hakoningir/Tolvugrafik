@@ -109,17 +109,18 @@ function collisionDetection(){
     var frogHeight= 0.1;
     for(var i = 0; i < cars.length; i+=6){
         for(var j = 0; j < frogLoc.length; j++){
-            for(var k = 0; k < 6; k++){
-                if( cars[i][0] <= frogLoc[j][0] + frogWidth  && 
-                    cars[i][0] + carWidth >= frogLoc[j][0]  && 
-                    cars[i][1] <= frogLoc[j][1] + frogHeight && 
-                    cars[i][1] + carHeight >= frogLoc[j][1]) {
+            // for(var k = 0; k < 6; k++){
+                if( cars[i][0] <= (frogLoc[j][0] + frogWidth)-0.01  && 
+                    (cars[i][0] + carWidth)-0.01 >= frogLoc[j][0]  && 
+                    cars[i][1] <= (frogLoc[j][1] + frogHeight)-0.01 && 
+                    (cars[i][1] + carHeight)-0.01 >= frogLoc[j][1]) {
                     console.log("dead");
                     collision =  true;
                 }
-            }
+            // }
         }
     }
+    return collision;
 }
 
 window.onload = function init() {
@@ -245,7 +246,7 @@ function render() {
     gl.drawArrays( gl.TRIANGLES, 0, 3 );
 
     collisionDetection()
-
+    console.log(collision);
     window.requestAnimationFrame(render);
 }
 
