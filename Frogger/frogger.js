@@ -6,6 +6,7 @@ var carBuffer;
 var colorCars = vec4(1,0,0,1);
 var frogBuffer;
 var colorFrog = vec4(0,1,0,1)
+var scoreBuffer;
 var vPosition;
 var frogLoc = [
     vec2( 0,   -0.8 ),
@@ -16,13 +17,18 @@ var cars = [];
 var color;
 var carsInRow = 3;
 var collision = false;
+var gameScore = 0;
+var score = [];
+var scoreColor = vec4(0,0,1,1);
+var shift = 0;
+
 function generateCars(){
     for(let i = 0; i < carsInRow; i++){
         cars.push(
             // first street
+            vec2(0.7+i*0.8, -0.61),
             vec2(0.9+i*0.8, -0.61),
             vec2(0.9+i*0.8, -0.69),
-            vec2(0.7+i*0.8, -0.61),
             vec2(0.7+i*0.8, -0.61),
             vec2(0.7+i*0.8, -0.69),
             vec2(0.9+i*0.8, -0.69),
@@ -30,41 +36,41 @@ function generateCars(){
             vec2(-(0.9+i*0.8), -0.41),
             vec2(-(0.9+i*0.8), -0.49),
             vec2(-(0.7+i*0.8), -0.49),
-            vec2(-(0.7+i*0.8), -0.49),
-            vec2(-(0.7+i*0.8), -0.41),
             vec2(-(0.9+i*0.8), -0.41),
+            vec2(-(0.7+i*0.8), -0.41),
+            vec2(-(0.7+i*0.8), -0.49),
 
             // third street
+            vec2(0.7+i*0.8, -0.21),
             vec2(0.9+i*0.8, -0.21),
             vec2(0.9+i*0.8, -0.29),
-            vec2(0.7+i*0.8, -0.21),
             vec2(0.7+i*0.8, -0.21),
             vec2(0.7+i*0.8, -0.29),
             vec2(0.9+i*0.8, -0.29),
 
             // fourth street
+            vec2(-(0.9+i*0.8), 0.29),
             vec2(-(0.9+i*0.8), 0.21),
+            vec2(-(0.7+i*0.8), 0.21),
             vec2(-(0.9+i*0.8), 0.29),
-            vec2(-(0.7+i*0.8), 0.21),
-            vec2(-(0.7+i*0.8), 0.21),
             vec2(-(0.7+i*0.8), 0.29),
-            vec2(-(0.9+i*0.8), 0.29),
+            vec2(-(0.7+i*0.8), 0.21),
 
             //fifth street
+            vec2(0.7+i*0.8, 0.49),
             vec2(0.9+i*0.8, 0.41),
             vec2(0.9+i*0.8, 0.49),
-            vec2(0.7+i*0.8, 0.49),
-            vec2(0.7+i*0.8, 0.49),
             vec2(0.7+i*0.8, 0.41),
+            vec2(0.7+i*0.8, 0.49),
             vec2(0.9+i*0.8, 0.41),
 
             // sixth street
-            vec2(-(0.9+i*0.8), 0.61),
             vec2(-(0.9+i*0.8), 0.69),
-            vec2(-(0.7+i*0.8), 0.61),
+            vec2(-(0.9+i*0.8), 0.61),
             vec2(-(0.7+i*0.8), 0.61),
             vec2(-(0.7+i*0.8), 0.69),
             vec2(-(0.9+i*0.8), 0.69),
+            vec2(-(0.7+i*0.8), 0.61),
         );
     }
     return cars;
@@ -103,26 +109,44 @@ function moveCars(offset){
 }
 
 function collisionDetection(){
-    var carWidth = 0.2;
-    var carHeight = 0.08;
-    var frogWidth = 0.2;
-    var frogHeight= 0.1;
-    for(var i = 0; i < cars.length; i+=6){
-        for(var j = 0; j < frogLoc.length; j++){
-            // for(var k = 0; k < 6; k++){
-                if( cars[i][0] <= (frogLoc[j][0] + frogWidth)-0.01  && 
-                    (cars[i][0] + carWidth)-0.01 >= frogLoc[j][0]  && 
-                    cars[i][1] <= (frogLoc[j][1] + frogHeight)-0.01 && 
-                    (cars[i][1] + carHeight)-0.01 >= frogLoc[j][1]) {
-                    console.log("dead");
-                    collision =  true;
-                }
-            // }
+    var frogMiddle = [frogLoc[0][0], frogLoc[0][1]-0.05];
+    for(var i = 0; i < cars.length; i++){
+        if( cars[i][0] < frogLoc[1][0] &&
+            cars[i][0] > frogLoc[2][0] &&
+            cars[i][1] < frogMiddle[1] &&
+            cars[i][1] > frogMiddle[1]) {
+                console.log("dead");
+                frogLoc = [
+                    vec2( 0,   -0.8 ),
+                    vec2( 0.1, -0.9 ),
+                    vec2(-0.1, -0.9 )
+                ];
+                gameScore = 0;
         }
     }
     return collision;
 }
 
+function increaseScore(shift){
+    if(frogLoc[0][1] > 0.8 && gameScore % 2 == 0){
+        gameScore++;
+    }
+    else if(frogLoc[0][1] < -0.8 && gameScore % 2 == 1){
+        gameScore++;
+    }
+    
+    score = [
+        vec2(-0.9+shift, -0.95),
+        vec2(-0.9+shift, -0.85),
+        vec2(-0.87+shift, -0.95),
+        vec2(-0.87+shift, -0.85),
+        vec2(-0.9+shift, -0.85),
+        vec2(-0.87+shift, -0.95),
+    ];
+    // gl.bindBuffer(gl.ARRAY_BUFFER, scoreBuffer); 
+    // gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(score));
+    shift += 0.04
+}
 window.onload = function init() {
 
     canvas = document.getElementById( "gl-canvas" );
@@ -173,6 +197,10 @@ window.onload = function init() {
     gl.bindBuffer( gl.ARRAY_BUFFER, frogBuffer );
     gl.bufferData( gl.ARRAY_BUFFER, flatten(frogLoc), gl.DYNAMIC_DRAW );
 
+    scoreBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, scoreBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(score), gl.STATIC_DRAW );
+  
     // Associate out shader variables with our data buffer
     vPosition = gl.getAttribLocation( program, "vPosition" );
     gl.enableVertexAttribArray( vPosition );
@@ -234,19 +262,23 @@ function render() {
     //carBuffer
     gl.bindBuffer( gl.ARRAY_BUFFER, carBuffer );    
     gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(cars));
-    moveCars(0.01);
+    moveCars(0.001);
     gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0,0);
     gl.uniform4fv(color, flatten(colorCars));
     gl.drawArrays( gl.TRIANGLES, 0, cars.length );
-
     //frogBuffer
     gl.bindBuffer( gl.ARRAY_BUFFER, frogBuffer);
     gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0,0);
     gl.uniform4fv(color, flatten(colorFrog));
     gl.drawArrays( gl.TRIANGLES, 0, 3 );
-
-    collisionDetection()
-    console.log(collision);
+    //scoreBuffer
+    gl.bindBuffer( gl.ARRAY_BUFFER, scoreBuffer );
+    gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0,0);
+    gl.uniform4fv(color, flatten(scoreColor));
+    gl.drawArrays( gl.TRIANGLES, 0, score.length );
+    
+    increaseScore();
+    collisionDetection();
     window.requestAnimationFrame(render);
 }
 
