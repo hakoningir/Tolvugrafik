@@ -16,7 +16,6 @@ var sideWalk = [];
 var cars = [];
 var color;
 var carsInRow = 3;
-var collision = false;
 var gameScore = 0;
 var score = [];
 var scoreColor = vec4(0,0,1,1);
@@ -109,19 +108,14 @@ function moveCars(offset){
 }
 
 function collisionDetection(){
+    var collision = false;
     var frogMiddle = [frogLoc[0][0], frogLoc[0][1]-0.05];
-    for(var i = 0; i < cars.length; i++){
-        if( cars[i][0] < frogLoc[1][0] &&
-            cars[i][0] > frogLoc[2][0] &&
+    for(var i = 0; i < cars.length; i+=6){
+        if( cars[i][0] < (frogMiddle[0]-0.1||frogMiddle[0]+0.1) &&
+            cars[i][0]+0.2 > (frogMiddle[0]-0.1||frogMiddle[0]+0.1) &&
             cars[i][1] < frogMiddle[1] &&
-            cars[i][1] > frogMiddle[1]) {
-                console.log("dead");
-                frogLoc = [
-                    vec2( 0,   -0.8 ),
-                    vec2( 0.1, -0.9 ),
-                    vec2(-0.1, -0.9 )
-                ];
-                gameScore = 0;
+            cars[i][1]-0.08 > frogMiddle[1]) {
+                collision = true
         }
     }
     return collision;
@@ -272,13 +266,22 @@ function render() {
     gl.uniform4fv(color, flatten(colorFrog));
     gl.drawArrays( gl.TRIANGLES, 0, 3 );
     //scoreBuffer
-    gl.bindBuffer( gl.ARRAY_BUFFER, scoreBuffer );
-    gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0,0);
-    gl.uniform4fv(color, flatten(scoreColor));
-    gl.drawArrays( gl.TRIANGLES, 0, score.length );
+    // gl.bindBuffer( gl.ARRAY_BUFFER, scoreBuffer );
+    // gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0,0);
+    // gl.uniform4fv(color, flatten(scoreColor));
+    // gl.drawArrays( gl.TRIANGLES, 0, score.length );
+    collisionDetection();
+    if(collisionDetection()){
+        frogLoc = [
+            vec2( 0,   -0.8 ),
+            vec2( 0.1, -0.9 ),
+            vec2(-0.1, -0.9 )
+        ];
+        
+        gameScore = 0;
+    }
     
     increaseScore();
-    collisionDetection();
     window.requestAnimationFrame(render);
 }
 
