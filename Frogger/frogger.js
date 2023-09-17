@@ -111,36 +111,54 @@ function collisionDetection(){
     var collision = false;
     var frogMiddle = [frogLoc[0][0], frogLoc[0][1]-0.05];
     for(var i = 0; i < cars.length; i+=6){
-        if( cars[i][0] < (frogMiddle[0]-0.1||frogMiddle[0]+0.1) &&
-            cars[i][0]+0.2 > (frogMiddle[0]-0.1||frogMiddle[0]+0.1) &&
-            cars[i][1] < frogMiddle[1] &&
-            cars[i][1]-0.08 > frogMiddle[1]) {
+        if( cars[i][0] <= frogMiddle[0] &&
+            cars[i][0]+0.2 >= frogMiddle[0] &&
+            cars[i][1]-0.08 <= frogMiddle[1] &&
+            cars[i][1] >= frogMiddle[1]) {
+                gameScore = 0;
                 collision = true
+                
         }
     }
     return collision;
 }
 
-function increaseScore(shift){
-    if(frogLoc[0][1] > 0.8 && gameScore % 2 == 0){
+function increaseScore() {
+    if (frogLoc[0][1] > 0.8 && gameScore % 2 == 0) {
         gameScore++;
-    }
-    else if(frogLoc[0][1] < -0.8 && gameScore % 2 == 1){
+        document.getElementById("gameScore").innerHTML = 'Score: ' + gameScore; 
+        score.push([
+            vec2(-0.9 + shift, -0.95),
+            vec2(-0.9 + shift, -0.85),
+            vec2(-0.87 + shift, -0.95),
+            vec2(-0.87 + shift, -0.85),
+            vec2(-0.9 + shift, -0.85),
+            vec2(-0.87 + shift, -0.95),
+        ]);
+        shift += 0.04;
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, scoreBuffer);
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(score));
+        return true;
+    } 
+    else if (frogLoc[0][1] < -0.8 && gameScore % 2 == 1) {
         gameScore++;
+        document.getElementById("gameScore").innerHTML = 'Score: ' + gameScore; 
+        score.push([
+            vec2(-0.9 + shift, -0.95),
+            vec2(-0.9 + shift, -0.85),
+            vec2(-0.87 + shift, -0.95),
+            vec2(-0.87 + shift, -0.85),
+            vec2(-0.9 + shift, -0.85),
+            vec2(-0.87 + shift, -0.95),
+        ]);
+        shift += 0.04;
+        return true;
     }
-    
-    score = [
-        vec2(-0.9+shift, -0.95),
-        vec2(-0.9+shift, -0.85),
-        vec2(-0.87+shift, -0.95),
-        vec2(-0.87+shift, -0.85),
-        vec2(-0.9+shift, -0.85),
-        vec2(-0.87+shift, -0.95),
-    ];
-    // gl.bindBuffer(gl.ARRAY_BUFFER, scoreBuffer); 
-    // gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(score));
-    shift += 0.04
+    return false;
 }
+
+
 window.onload = function init() {
 
     canvas = document.getElementById( "gl-canvas" );
@@ -266,10 +284,14 @@ function render() {
     gl.uniform4fv(color, flatten(colorFrog));
     gl.drawArrays( gl.TRIANGLES, 0, 3 );
     //scoreBuffer
-    // gl.bindBuffer( gl.ARRAY_BUFFER, scoreBuffer );
-    // gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0,0);
-    // gl.uniform4fv(color, flatten(scoreColor));
-    // gl.drawArrays( gl.TRIANGLES, 0, score.length );
+    increaseScore();
+    if (increaseScore) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, scoreBuffer);
+        gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
+        gl.uniform4fv(color, flatten(scoreColor));
+        gl.drawArrays(gl.TRIANGLES, 0, score.length);
+    }
+
     collisionDetection();
     if(collisionDetection()){
         frogLoc = [
@@ -281,7 +303,6 @@ function render() {
         gameScore = 0;
     }
     
-    increaseScore();
     window.requestAnimationFrame(render);
 }
 
