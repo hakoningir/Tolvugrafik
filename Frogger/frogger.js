@@ -137,8 +137,8 @@ function increaseScore() {
         ]);
         shift += 0.04;
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, scoreBuffer);
-        gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(score));
+        // gl.bindBuffer(gl.ARRAY_BUFFER, scoreBuffer);
+        // gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(score));
         return true;
     } 
     else if (frogLoc[0][1] < -0.8 && gameScore % 2 == 1) {
@@ -274,7 +274,7 @@ function render() {
     //carBuffer
     gl.bindBuffer( gl.ARRAY_BUFFER, carBuffer );    
     gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(cars));
-    moveCars(0.001);
+    moveCars(0.008);
     gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0,0);
     gl.uniform4fv(color, flatten(colorCars));
     gl.drawArrays( gl.TRIANGLES, 0, cars.length );
@@ -285,12 +285,12 @@ function render() {
     gl.drawArrays( gl.TRIANGLES, 0, 3 );
     //scoreBuffer
     increaseScore();
-    if (increaseScore) {
-        gl.bindBuffer(gl.ARRAY_BUFFER, scoreBuffer);
-        gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
-        gl.uniform4fv(color, flatten(scoreColor));
-        gl.drawArrays(gl.TRIANGLES, 0, score.length);
-    }
+    // if (increaseScore) {
+    //     gl.bindBuffer(gl.ARRAY_BUFFER, scoreBuffer);
+    //     gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
+    //     gl.uniform4fv(color, flatten(scoreColor));
+    //     gl.drawArrays(gl.TRIANGLES, 0, score.length);
+    // }
 
     collisionDetection();
     if(collisionDetection()){
