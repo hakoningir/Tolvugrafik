@@ -20,8 +20,10 @@ var vertices = new Float32Array([-0.05, -0.05, 0.05, -0.05, 0.05, 0.05, -0.05, 0
 
 // buffers
 var spadeBuffer;
-var bufferId;
-
+var ballBuffer;
+var vPosition;
+// global uniform
+var locColor;
 // spaði
 var spade = [
     vec2(0.2, -0.9),
@@ -51,22 +53,25 @@ window.onload = function init() {
     //
     var program = initShaders( gl, "vertex-shader", "fragment-shader" );
     gl.useProgram( program );
+    
+    vPosition = gl.getAttribLocation( program, "vPosition" );
+    gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( vPosition );
 
     spadeBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, spadeBuffer );
     gl.bufferData( gl.ARRAY_BUFFER, flatten(spade), gl.DYNAMIC_DRAW );
+    gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
     
     // Load the data into the GPU
-    bufferId = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, bufferId );
+    ballBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, ballBuffer );
     gl.bufferData( gl.ARRAY_BUFFER, flatten(vertices), gl.DYNAMIC_DRAW );
 
     // Associate out shader variables with our data buffer
-    var vPosition = gl.getAttribLocation( program, "vPosition" );
-    gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
-    gl.enableVertexAttribArray( vPosition );
 
     locBox = gl.getUniformLocation( program, "boxPos" );
+    locColor = gl.getUniformLocation( program, "fColor");
 
     // Meðhöndlun örvalykla
     window.addEventListener("keydown", function(e){
@@ -89,6 +94,7 @@ window.onload = function init() {
             }
         }
         gl.bindBuffer( gl.ARRAY_BUFFER, spadeBuffer);
+        gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(spade));
     } );
 
@@ -100,6 +106,8 @@ function render() {
     
     gl.clear( gl.COLOR_BUFFER_BIT );
     gl.bindBuffer( gl.ARRAY_BUFFER, spadeBuffer);
+    gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
+    gl.uniform4fv(locColor, vec4(0,1,0,1));
     gl.drawArrays( gl.TRIANGLES, 3, 6);
     
 
@@ -111,11 +119,12 @@ function render() {
     box[0] += dX;
     box[1] += dY;
     
-    gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
+    gl.bindBuffer(gl.ARRAY_BUFFER, ballBuffer);
+    gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
     
     //
     gl.uniform2fv( locBox, flatten(box) );
-
+    gl.uniform4fv(locColor, vec4(1,0,0,1));
     gl.drawArrays( gl.TRIANGLE_FAN, 0, 4 );
 
     

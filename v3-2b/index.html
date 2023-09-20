@@ -15,26 +15,18 @@ void main()
     vec4 tpos = vPosition;
     
     tpos.y = 1.0 - mod(0.0015*time + tpos.y+1.0, 2.0);
-    if(tpos.x < -0.4 && tpos.y > 0.2){
-        color = vec3(0,0,1);
-    }
-    else if(tpos.x > 0.0 && tpos.y > 0.2){
-        color = vec3(0,0,1);
-    }
-    else if(tpos.x > 0.0 && tpos.y < -0.2){
-        color = vec3(0,0,1);
-    }
-    else if(tpos.x < -0.4 && tpos.y < -0.2){
-        color = vec3(0,0,1);
-    }
-    else if(tpos.x > -0.3 && tpos.x < -0.1){
-        color = vec3(1,0,0);
-    }
-    else if(tpos.y > -0.1 && tpos.y < 0.1){
-        color = vec3(1,0,0);
-    }
-    else{
+    color = vec3(0,0,1);
+    if(tpos.x > -0.4 && tpos.x < 0.0){
         color = vec3(1,1,1);
+    }
+    if(tpos.y > -0.2 && tpos.y < 0.2){
+        color = vec3(1,1,1);
+    }
+    if(tpos.x > -0.3 && tpos.x < -0.1){
+        color = vec3(1,0,0);
+    }
+    if(tpos.y > -0.1 && tpos.y < 0.1){
+        color = vec3(1,0,0);
     }
 
 
