@@ -24,12 +24,12 @@ var bufferId;
 
 // spaði
 var spade = [
-    vec2(-0.9, 0.1),
-    vec2(-0.9, -0.1),
-    vec2(-0.8, -0.1),
-    vec2(-0.8, -0.1),
-    vec2(-0.8, 0.1),
-    vec2(-0.9, 0.1),
+    vec2(0.2, -0.9),
+    vec2(0.2, -0.8),
+    vec2(-0.2, -0.9),
+    vec2(0.2, -0.8),
+    vec2(-0.2, -0.8),
+    vec2(-0.2, -0.9),
 ];
 
 window.onload = function init() {
@@ -70,22 +70,25 @@ window.onload = function init() {
 
     // Meðhöndlun örvalykla
     window.addEventListener("keydown", function(e){
-        switch( e.code ) {
-            case "ArrowUp":	// upp ör
-                dX *= 1.1;
-                dY *= 1.1;
+        if(e.code == "ArrowRight") {
+            dX *= 1.1;
+            dY *= 1.1;
+            if(spade[1][0] < -1){
                 for(let i = 0; i < spade.length; i++){
-                    spade[i][1] += 0.1;
+                    spade[i][0] += 0.1;
                 }
-                break;
-            case "ArrowDown":	// niður ör
-                dX /= 1.1;
-                dY /= 1.1;
-                for(let i = 0; i < spade.length; i++){
-                    spade[i][1] -= 0.1;
-                }
-                break;
+            }
         }
+        if(e.code == "ArrowLeft"){
+            dX /= 1.1;
+            dY /= 1.1;
+            if(spade[5][0] > -1){
+                for(let i = 0; i < spade.length; i++){
+                    spade[i][0] -= 0.1;
+                }
+            }
+        }
+        gl.bindBuffer( gl.ARRAY_BUFFER, spadeBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(spade));
     } );
 
@@ -94,10 +97,11 @@ window.onload = function init() {
 
 
 function render() {
+    
+    gl.clear( gl.COLOR_BUFFER_BIT );
     gl.bindBuffer( gl.ARRAY_BUFFER, spadeBuffer);
-
-    gl.drawArrays( gl.TRIANGLES, 0, spade.length);
-    gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
+    gl.drawArrays( gl.TRIANGLES, 3, 6);
+    
 
     // Láta ferninginn skoppa af veggjunum
     if (Math.abs(box[0] + dX) > maxX - boxRad) dX = -dX;
@@ -107,7 +111,7 @@ function render() {
     box[0] += dX;
     box[1] += dY;
     
-    gl.clear( gl.COLOR_BUFFER_BIT );
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
     
     //
     gl.uniform2fv( locBox, flatten(box) );
