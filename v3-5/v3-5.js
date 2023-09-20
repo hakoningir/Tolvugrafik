@@ -1,9 +1,13 @@
 var canvas;
 var gl;
 
-// Núverandi staðsetning miðju ferningsins
-var box = vec2( 0.0, 0.0 );
-
+// teikna manually inn kassann, sorry Hjálmtýr hitt skemmdi lógíkina mína
+var box = [
+    vec2(-0.05, 0.05),
+    vec2(-0.05, -0.05),
+    vec2(0.05, -0.05),
+    vec2(0.05, 0.05),
+]
 // Stefna (og hraði) fernings
 var dX;
 var dY;
@@ -12,19 +16,15 @@ var dY;
 var maxX = 1.0;
 var maxY = 1.0;
 
-// Hálf breidd/hæð ferningsins
-var boxRad = 0.05;
-
-// Ferningurinn er upphaflega í miðjunni
-var vertices = new Float32Array([-0.05, -0.05, 0.05, -0.05, 0.05, 0.05, -0.05, 0.05]);
-
-// buffers
+// buffers and such
 var spadeBuffer;
 var ballBuffer;
 var vPosition;
+
 // global uniform
 var locColor;
-// spaði
+
+// spaði til að lemja bolta með
 var spade = [
     vec2(0.2, -0.9),
     vec2(0.2, -0.8),
@@ -54,76 +54,72 @@ window.onload = function init() {
     var program = initShaders( gl, "vertex-shader", "fragment-shader" );
     gl.useProgram( program );
     
-    vPosition = gl.getAttribLocation( program, "vPosition" );
-    gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
-    gl.enableVertexAttribArray( vPosition );
-
-    spadeBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, spadeBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(spade), gl.DYNAMIC_DRAW );
-    gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
-    
     // Load the data into the GPU
     ballBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, ballBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(vertices), gl.DYNAMIC_DRAW );
-
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(box), gl.DYNAMIC_DRAW );
+    
+    spadeBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, spadeBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(spade), gl.DYNAMIC_DRAW );
+    
     // Associate out shader variables with our data buffer
+    vPosition = gl.getAttribLocation( program, "vPosition" );
+    gl.enableVertexAttribArray( vPosition );
+    gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
 
-    locBox = gl.getUniformLocation( program, "boxPos" );
+    //uniform breytur
     locColor = gl.getUniformLocation( program, "fColor");
 
     // Meðhöndlun örvalykla
     window.addEventListener("keydown", function(e){
-        if(e.code == "ArrowRight") {
-            dX *= 1.1;
-            dY *= 1.1;
-            if(spade[1][0] < -1){
-                for(let i = 0; i < spade.length; i++){
-                    spade[i][0] += 0.1;
-                }
-            }
+        if(e.code == "ArrowRight" && spade[0][0] < 1) {
+            for(let i = 0; i < spade.length; i++){
+                spade[i][0] += 0.1;
+            } 
         }
-        if(e.code == "ArrowLeft"){
-            dX /= 1.1;
-            dY /= 1.1;
-            if(spade[5][0] > -1){
-                for(let i = 0; i < spade.length; i++){
-                    spade[i][0] -= 0.1;
-                }
+        if(e.code == "ArrowLeft" && spade[5][0] > -1){
+            for(let i = 0; i < spade.length; i++){
+                spade[i][0] -= 0.1;
             }
         }
         gl.bindBuffer( gl.ARRAY_BUFFER, spadeBuffer);
-        gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(spade));
     } );
 
     render();
 }
 
+// function collisionDetection(){
+//     for(let i = 0; i < spade.length; i++){
+//         for(let j = 0; j < box.length; j++){
+//             if()
+//         }
+//     }
+// }
+//who the fuck knows geri þetta á morgun
+
+function moveBall(){
+    if(box[3][0]  >= maxX || box[1][0] <= -maxX)dX = -dX;
+    if(box[3][1]  >= maxY || box[1][1] <= -maxY)dY = -dY;
+    for(let i = 0; i < box.length; i++){
+        box[i][0] += dX;
+        box[i][1] += dY;
+    }
+    gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(box));
+}
 
 function render() {
-    
     gl.clear( gl.COLOR_BUFFER_BIT );
     gl.bindBuffer( gl.ARRAY_BUFFER, spadeBuffer);
     gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
     gl.uniform4fv(locColor, vec4(0,1,0,1));
-    gl.drawArrays( gl.TRIANGLES, 3, 6);
-    
+    gl.drawArrays( gl.TRIANGLES, 0, 6);
 
-    // Láta ferninginn skoppa af veggjunum
-    if (Math.abs(box[0] + dX) > maxX - boxRad) dX = -dX;
-    if (Math.abs(box[1] + dY) > maxY - boxRad) dY = -dY;
-    
-    // Uppfæra staðsetningu
-    box[0] += dX;
-    box[1] += dY;
-    
+
     gl.bindBuffer(gl.ARRAY_BUFFER, ballBuffer);
     gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
-    
-    //
-    gl.uniform2fv( locBox, flatten(box) );
+    moveBall();
     gl.uniform4fv(locColor, vec4(1,0,0,1));
     gl.drawArrays( gl.TRIANGLE_FAN, 0, 4 );
 
