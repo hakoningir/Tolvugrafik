@@ -26,9 +26,9 @@ var locColor;
 
 // spaði til að lemja bolta með
 var spade = [
+    vec2(-0.2, -0.9),
     vec2(0.2, -0.9),
     vec2(0.2, -0.8),
-    vec2(-0.2, -0.9),
     vec2(0.2, -0.8),
     vec2(-0.2, -0.8),
     vec2(-0.2, -0.9),
@@ -89,19 +89,32 @@ window.onload = function init() {
 
     render();
 }
-
-// function collisionDetection(){
-//     for(let i = 0; i < spade.length; i++){
-//         for(let j = 0; j < box.length; j++){
-//             if()
-//         }
-//     }
-// }
-//who the fuck knows geri þetta á morgun
-
+/*
+var spade = [
+    vec2(-0.2, -0.9),
+    vec2(0.2, -0.9),
+    vec2(0.2, -0.8),
+    vec2(0.2, -0.8),
+    vec2(-0.2, -0.8),
+    vec2(-0.2, -0.9),
+];
+var box = [
+     vec2(-0.05, 0.05),
+     vec2(-0.05, -0.05),
+     vec2(0.05, -0.05),
+     vec2(0.05, 0.05),
+ ]
+*/
 function moveBall(){
+    var spadeMidX = spade[0][0] + 0.2;
+    var spadeMidY = spade[0][1] + 0.05;
     if(box[3][0]  >= maxX || box[1][0] <= -maxX)dX = -dX;
     if(box[3][1]  >= maxY || box[1][1] <= -maxY)dY = -dY;
+    if(
+        box[0][0] <= spadeMidX + 0.2 && 
+        box[3][0] >= spadeMidX - 0.2 && 
+        box[1][1] <= spadeMidY +0.05 && 
+        box[3][1] >= spadeMidY -0.05) dY = -dY;
     for(let i = 0; i < box.length; i++){
         box[i][0] += dX;
         box[i][1] += dY;
