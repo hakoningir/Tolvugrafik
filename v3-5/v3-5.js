@@ -44,9 +44,13 @@ window.onload = function init() {
     gl.viewport( 0, 0, canvas.width, canvas.height );
     gl.clearColor( 0.8, 0.8, 0.8, 1.0 );
     
+    var speed = 0.02;
+
+    const randomAngle = Math.random() * 2 * Math.PI;
+
     // Gefa ferningnum slembistefnu í upphafi
-    dX = Math.random()*0.1-0.05;
-    dY = Math.random()*0.1-0.05;
+    dX = Math.cos(randomAngle) * speed;
+    dY = Math.sin(randomAngle) * speed;
 
     //
     //  Load shaders and initialize attribute buffers
