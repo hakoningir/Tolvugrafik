@@ -3,7 +3,6 @@
 <head>
 <script id="vertex-shader" type="x-shader/x-vertex">
 attribute vec4 vPosition;
-uniform float time;
 
 void
 main()
@@ -14,12 +13,12 @@ main()
 
 <script id="fragment-shader" type="x-shader/x-fragment">
 precision mediump float;
-uniform vec4 color;
+uniform float time;
 
 void
 main()
 {
-    gl_FragColor = color;
+    gl_FragColor = vec4(sin(time), cos(time), tan(time), 1.0);
 }
 </script>
 

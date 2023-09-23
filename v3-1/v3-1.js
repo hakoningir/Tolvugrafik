@@ -2,7 +2,6 @@ var gl;
 var points;
 var time;
 var iniTime;
-var color;
 var counter = 0;
 window.onload = function init()
 {
@@ -34,10 +33,7 @@ window.onload = function init()
     gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vPosition );
 
-    color = gl.getUniformLocation( program, "color" );
-
     time = gl.getUniformLocation( program, "time");
-    iniTime = Date.now();
     
     render();
 };
@@ -45,22 +41,10 @@ window.onload = function init()
 
 function render() {
     gl.clear( gl.COLOR_BUFFER_BIT );
-    var msek = Date.now() - iniTime;
-    if(msek % 30 == 0){
-        if(counter == 0){
-            var col = vec4( 1, 0, 0, 1);
-            counter++;
-        }
-        else if(counter == 1){
-            var col = vec4( 0, 1, 0, 1);
-            counter++;
-        }
-        else if(counter == 2){
-            var col = vec4( 0, 0, 1, 1);
-            counter = 0;
-        }
-        gl.uniform4fv( color, flatten(col) );
+    if(counter % 80 == 0){
+        gl.uniform1f(time, performance.now());
     }
+    counter++
     gl.drawArrays( gl.TRIANGLES, 0, 3 );
 
     window.requestAnimationFrame( render );

@@ -77,12 +77,12 @@ window.onload = function init() {
 
     // Meðhöndlun örvalykla
     window.addEventListener("keydown", function(e){
-        if(e.code == "ArrowRight" && spade[0][0] < 1) {
+        if(e.code == "ArrowRight" && spade[3][0]+0.1 < 1) {
             for(let i = 0; i < spade.length; i++){
                 spade[i][0] += 0.1;
             } 
         }
-        if(e.code == "ArrowLeft" && spade[5][0] > -1){
+        if(e.code == "ArrowLeft" && spade[5][0]-0.1 > -1){
             for(let i = 0; i < spade.length; i++){
                 spade[i][0] -= 0.1;
             }
@@ -93,22 +93,7 @@ window.onload = function init() {
 
     render();
 }
-/*
-var spade = [
-    vec2(-0.2, -0.9),
-    vec2(0.2, -0.9),
-    vec2(0.2, -0.8),
-    vec2(0.2, -0.8),
-    vec2(-0.2, -0.8),
-    vec2(-0.2, -0.9),
-];
-var box = [
-     vec2(-0.05, 0.05),
-     vec2(-0.05, -0.05),
-     vec2(0.05, -0.05),
-     vec2(0.05, 0.05),
- ]
-*/
+
 function moveBall(){
     var spadeMidX = spade[0][0] + 0.2;
     var spadeMidY = spade[0][1] + 0.05;
@@ -132,7 +117,6 @@ function render() {
     gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
     gl.uniform4fv(locColor, vec4(0,1,0,1));
     gl.drawArrays( gl.TRIANGLES, 0, 6);
-
 
     gl.bindBuffer(gl.ARRAY_BUFFER, ballBuffer);
     gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
