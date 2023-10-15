@@ -4,22 +4,24 @@ var gl;
 var NumVertices  = 9;
 var NumBody = 6;
 var NumTail = 3;
-
+var NumFish = 300;
+var fishColor = [];
 let mv;
 
-// Hnútar fisks á xy-planinu
+var moveFishX = [];
+var moveFishY = [];
+var moveFishZ = [];
+
 var vertices = [
-    // líkami (spjald)
     vec4( -0.5,  0.0, 0.0, 1.0 ),
 	vec4(  0.2,  0.2, 0.0, 1.0 ),
 	vec4(  0.5,  0.0, 0.0, 1.0 ),
 	vec4(  0.5,  0.0, 0.0, 1.0 ),
 	vec4(  0.2, -0.15, 0.0, 1.0 ),
 	vec4( -0.5,  0.0, 0.0, 1.0 ),
-	// sporður (þríhyrningur)
     vec4( -0.5,  0.0, 0.0, 1.0 ),
     vec4( -0.65,  0.15, 0.0, 1.0 ),
-    vec4( -0.65, -0.15, 0.0, 1.0 )
+    vec4( -0.65, -0.15, 0.0, 1.0 ),
 ];
 
 
@@ -29,8 +31,8 @@ var spinY = 0;
 var origX;
 var origY;
 
-var rotTail = 0.0;        // Snúningshorn sporðs
-var incTail = 2.0;        // Breyting á snúningshorni
+var rotTail = [];        // Snúningshorn sporðs
+var incTail = [];        // Breyting á snúningshorni
 
 var zView = 2.0;          // Staðsetning áhorfanda á z-hniti
 
@@ -40,6 +42,7 @@ var colorLoc;
 
 var vPosition;
 
+var boxSize = 10;
 var boxVertices = [
     vec4(-10, 10, -10, 1.0),
     vec4(-10, -10, -10, 1.0),
@@ -130,32 +133,105 @@ window.onload = function init() {
              zView += 0.2;
         }
     });
-    makeFish();
-    console.log(vertices)
 
+    generateCoords();
+    getFishColor();
     render();
 }
 
-function makeFish(){
-    gl.bindBuffer(gl.ARRAY_BUFFER, fishBuffer);
-    gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 );
-    for(let i = 0; i < 100; i++){
-        var randX = 1-(Math.random()*2);
-        var randY = 1-(Math.random()*2);
-        var randZ = 1-(Math.random()*2);
-        vertices += [
-            vec4(       randX,      randY, randZ, 1.0 ),
-            vec4(   0.7+randX,  0.2+randY, randZ, 1.0 ),
-            vec4(   1.0+randX,      randY, randZ, 1.0 ),
-            vec4(   1.0+randX,      randY, randZ, 1.0 ),
-            vec4(   0.7+randX, -0.1+randY, randZ, 1.0 ),
-            vec4(   1.0+randX,      randY, randZ, 1.0 ),
-            vec4(       randX,      randY, randZ, 1.0 ),
-            vec4( -0.15+randX, 0.15+randY, randZ, 1.0 ),
-            vec4( -0.15+randX,-0.15+randY, randZ, 1.0 )
+function insideBox(fishCoord){
+    if(fishCoord > boxSize){
+        return -boxSize + 0.1;
+    }
+    if(fishCoord < boxSize){
+        return boxSize + 0.1;
+    }
+    return fishCoord;
+}
+
+function generateCoords(){
+    for(let i = 0; i < NumFish; i++){
+        var randX = (Math.random()*20)-10;
+        var randY = (Math.random()*20)-10;
+        var randZ = (Math.random()*20)-10;
+        moveFishX += [
+                  randX,
+              0.7+randX,
+              1.0+randX,
+              1.0+randX,
+              0.7+randX,
+              1.0+randX,
+                  randX,
+            -0.15+randX,
+            -0.15+randX,
+        ];
+        moveFishY += [
+                  randY,
+              0.2+randY,
+                  randY,
+                  randY,
+             -0.1+randY,
+                  randY,
+                  randY,
+             0.15+randY,
+            -0.15+randY,
+        ];
+        moveFishZ += [
+                  randZ,
+                  randZ,
+                  randZ,
+                  randZ,
+                  randZ,
+                  randZ,
+                  randZ,
+                  randZ,
+                  randZ,
         ];
     }
-    flatten(vertices)
+}
+function getFishColor(){
+    for(let i = 0; i < NumFish; i++){
+        let r = Math.random();
+        let g = Math.random();
+        let b = Math.random();
+        fishColor[i] = vec4(r,g,b,1);
+    }
+    return fishColor;
+}
+
+function makeAndMoveFish(mv, i){
+    gl.uniform4fv(colorLoc, fishColor[i]);
+    gl.bindBuffer(gl.ARRAY_BUFFER, fishBuffer);
+    gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0);
+    
+    if(boxSize + 0.2 < Math.abs(moveFishX[i])){
+        moveFishX[i] = insideBox(moveFishX[i]);
+    }
+    if(boxSize + 0.2 < Math.abs(moveFishY[i])){
+        moveFishY[i] = insideBox(moveFishY[i])
+    }
+    if(boxSize + 0.2 < Math.abs(moveFishZ[i])){
+        moveFishZ[i] = insideBox(moveFishZ[i])
+    }
+  
+    moveFishX[i] += 0.01;
+    moveFishY[i] += 0.01;
+    moveFishZ[i] += 0.01;
+  
+    mv = mult(mv, translate(moveFishX[i], moveFishY[i], moveFishZ[i]));
+
+    gl.uniformMatrix4fv(mvLoc, false, flatten(mv));
+    gl.drawArrays( gl.TRIANGLES, 0, NumBody );
+     
+    rotTail[i] += incTail[i];
+    if( rotTail[i] > 35.0  || rotTail[i] < -35.0 )
+        incTail[i] *= -1;
+    mv = mult( mv, translate ( -0.5, 0.0, 0.0 ) );
+    mv = mult( mv, rotateY( rotTail[i] ) );
+    mv = mult( mv, translate ( 0.5, 0.0, 0.0 ) );
+
+    gl.uniformMatrix4fv(mvLoc, false, flatten(mv));
+    gl.drawArrays( gl.TRIANGLES, NumBody, NumTail );    
 }
 
 function render() {
@@ -176,28 +252,8 @@ function render() {
     gl.uniformMatrix4fv(mvLoc, false, flatten(mv))
     gl.drawArrays( gl.LINE_STRIP, 0, boxVertices.length );
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, fishBuffer);
-    gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 );
-
-    rotTail += incTail;
-    if( rotTail > 35.0  || rotTail < -35.0 )
-        incTail *= -1;
-
-	gl.uniform4fv( colorLoc, vec4(0.2, 0.6, 0.9, 1.0));
-	// Teikna líkama fisks (án snúnings)
-    gl.uniformMatrix4fv(mvLoc, false, flatten(mv));
-    for(let i = 0; i < 100; i++){
-        gl.drawArrays( gl.TRIANGLES, 0, NumBody );    
-    }
-    
-    // Teikna sporð og snúa honum
-
-    mv = mult( mv, translate ( -0.5, 0.0, 0.0 ) );
-    mv = mult( mv, rotateY( rotTail ) );
-    mv = mult( mv, translate ( 0.5, 0.0, 0.0 ) );
-    gl.uniformMatrix4fv(mvLoc, false, flatten(mv));
-    for(let i = 0; i < 100; i++){
-        gl.drawArrays( gl.TRIANGLES, NumBody, NumTail );
+    for(let i = 0; i < NumFish; i++){
+        makeAndMoveFish(mv,i);
     }
     requestAnimationFrame( render );
 }
