@@ -18,12 +18,17 @@ var fovy = 60.0;
 var near = 0.2;
 var far = 100.0;
 var lowerLight = 1.8;
-var rad = 0;
+var rad = 1;
+let scaleTeapot = 1;
+let qPotNow = 4;
+var myTeapot = teapot(qPotNow);
 
-var myTeapot;
 var lightLoc;
 var vBuffer;
 var nBuffer;
+var vPosition;
+var vNormal;
+
 var lightPosition = vec4(10.0, 10.0, 10.0, 1.0 );
 var lightAmbient = vec4(1.0, 1.0, 1.0, 1.0 );
 var lightDiffuse = vec4( 1.0, 1.0, 1.0, 1.0 );
@@ -81,7 +86,7 @@ window.onload = function init() {
     gl.bindBuffer( gl.ARRAY_BUFFER, nBuffer);
     gl.bufferData( gl.ARRAY_BUFFER, flatten(normals), gl.STATIC_DRAW );
 
-    var vNormal = gl.getAttribLocation( program, "vNormal" );
+    vNormal = gl.getAttribLocation( program, "vNormal" );
     gl.vertexAttribPointer( vNormal, 4, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vNormal);
 
@@ -89,7 +94,7 @@ window.onload = function init() {
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW);
 
-    var vPosition = gl.getAttribLocation( program, "vPosition");
+    vPosition = gl.getAttribLocation( program, "vPosition");
     gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
 
@@ -144,39 +149,46 @@ window.onload = function init() {
             lowerLight -=0.1;
         }
         if(e.code == "ArrowUp"){
-            teapot_size()
+            rad += 1;
         }
         if(e.code == "ArrowDown"){
-            teapot_size()
+            rad -= 1;
         }
     })
     render();
 }
 
-function teapot_size(){
-    rad += 1;
-    let scaleTeapot = Math.abs(Math.sin(radians(rad)));
-    myTeapot = teapot(15);
-    myTeapot.scale(scaleTeapot, scaleTeapot, scaleTeapot);
-    
-    points = myTeapot.TriangleVertices.length;
+function teapot_size(qPot){
+    scaleTeapot += rad;
+    myTeapot = teapot(qPot);
+    var scale = Math.abs(Math.sin(radians(scaleTeapot)));
+    myTeapot.scale(scale, scale, scale);
+    points = myTeapot.TriangleVertices;
+    gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(myTeapot.TriangleVertices),gl.STATIC_DRAW);
+    gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0,0 );
+    gl.enableVertexAttribArray(vPosition);
+    gl.vertexAttribPointer( vNormal, 4, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( vNormal);
 }
 
 function render() {
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    teapot_size();
     gl.uniform1f(lightLoc, lowerLight);
+
+    teapot_size(qPotNow);
+    
     modelViewMatrix = lookAt( vec3(0.0, 0.0, zDist), at, up );
     modelViewMatrix = mult( modelViewMatrix, rotateY( -spinY ) );
     modelViewMatrix = mult( modelViewMatrix, rotateX( spinX ) );
-
+    
     normalMatrix = [
         vec3(modelViewMatrix[0][0], modelViewMatrix[0][1], modelViewMatrix[0][2]),
         vec3(modelViewMatrix[1][0], modelViewMatrix[1][1], modelViewMatrix[1][2]),
         vec3(modelViewMatrix[2][0], modelViewMatrix[2][1], modelViewMatrix[2][2])
     ];
 	normalMatrix.matrix = true;
-
+    
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix) );
     gl.uniformMatrix3fv(normalMatrixLoc, false, flatten(normalMatrix) );
 

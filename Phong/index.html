@@ -35,22 +35,28 @@ uniform vec4 ambientProduct;
 uniform vec4 diffuseProduct;
 uniform vec4 specularProduct;
 uniform float shininess;
-varying vec3 N, L, E;
+varying vec3 N, L, E, R;
+uniform bool model;
 
 void main()
 {
     vec4 fColor;
 
-    vec3 H = normalize( L + E );
+    vec3 H = normalize( normalize(L) + normalize(E) );
     vec4 ambient = ambientProduct;
 
-    float Kd = max( dot(L, N), 0.0 );
+    float Kd = max( dot(L), normalize(N), 0.0 );
     vec4  diffuse = Kd*diffuseProduct;
 
-    float Ks = pow( max(dot(N, H), 0.0), shininess );
+    float Ks;
+    if(model){
+        Ks = pow( max(dot(E, R), 0.0), shininess );
+    } else{
+        Ks = pow( max(dot(normalize(N), H), 0.0), shininess);
+    }
     vec4  specular = Ks * specularProduct;
 
-    if( dot(L, N) < 0.0 ) specular = vec4(0.0, 0.0, 0.0, 1.0);
+    if( dot(normalise(L), normalize(N)) < 0.0 ) specular = vec4(0.0, 0.0, 0.0, 1.0);
 
     fColor = ambient + diffuse +specular;
     fColor.a = 1.0;
@@ -65,7 +71,8 @@ void main()
 <script type="text/javascript" src="/Phong/teapotData.js"></script>
 <script type="text/javascript" src="/Phong/Phong.js"></script>
 
-<button>asdf</button>
+<input id="model" type="button"></input>
+<label for="model">{model ? "Phong" : "Blinn-Phong"}</label>
 <body>
     <canvas id="gl-canvas" width="600" height="600">
 </body>
