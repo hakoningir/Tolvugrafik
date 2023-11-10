@@ -273,10 +273,10 @@ var render = function(){
 
     // Teikna gólf með mynstri
     gl.bindTexture( gl.TEXTURE_2D, texGolf );
-    gl.drawArrays( gl.TRIANGLES, numVertices*4, numVertices*5 );
+    gl.drawArrays( gl.TRIANGLES, numVertices*4, numVertices );
 
     gl.bindTexture( gl.TEXTURE_2D, texLoft );
-    gl.drawArrays( gl.TRIANGLES, numVertices*5, numVertices*6);
+    gl.drawArrays( gl.TRIANGLES, numVertices*5, numVertices);
 
     requestAnimFrame(render);
 }
