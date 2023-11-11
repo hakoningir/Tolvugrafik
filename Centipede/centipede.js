@@ -37,42 +37,65 @@ function shotMovement(){
     });
 }
 
+const allTeemoShrooms = [];
+function teemoShrooms(){
+    const shroomGeometry = new THREE.SphereGeometry(0.2, 64, 32);
+    const material = new THREE.MeshBasicMaterial({color: 0xffff00});
+    const teemo = new THREE.Mesh( shroomGeometry, material);
+    allTeemoShrooms.push(teemo);
+    scene.add(teemo);
+}
+
+function collisionDetection(){
+    shotArray.forEach(shots => {
+        allTeemoShrooms.forEach(teemo => {
+            if( shots.position.y == teemo.position.y &&
+                shots.position.x == teemo.position.x){
+                    scene.remove(shots)
+                return true; //þarf að laga þetta
+            }
+        });
+    });
+    return false;
+}
+
 function keycodes(e) {
     switch( e.code ) {
         case "ArrowUp":	
-            player.position.y += 0.5;
+            player.position.y += 0.4;
             break;
         case "ArrowLeft":  
-            player.position.x -= 0.5;
+            player.position.x -= 0.4;
             break;
         case "ArrowDown":	
-            player.position.y -= 0.5;
+            player.position.y -= 0.4;
             break;
         case "ArrowRight":
-            player.position.x += 0.5;
+            player.position.x += 0.4;
             break;
         case "KeyW":	
-            player.position.y += 0.5;
+            player.position.y += 0.4;
             break;
          case "KeyA":
-            player.position.x -= 0.5;
+            player.position.x -= 0.4;
             break;
         case "KeyS":	
-            player.position.y -= 0.5;
+            player.position.y -= 0.4;
             break;
         case "KeyD":	
-            player.position.x += 0.5;
+            player.position.x += 0.4;
             break;
         case "Space":
             shoot();
             break
     }
 }
-
+teemoShrooms()
 function animate() {
-	requestAnimationFrame( animate );
+    requestAnimationFrame( animate );
     shotMovement();
-	renderer.render( scene, camera );
+    collisionDetection;
+    renderer.render( scene, camera );
 }
 animate();
 
