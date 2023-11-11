@@ -12,15 +12,25 @@ camera.position.z = 4;
 const renderer = new THREE.WebGLRenderer({canvas});
 
 // Búa til tening með grunnáferð (basic material) og bæta í sviðsnetið
-const geometry = new THREE.BoxGeometry();
+const playerGeometry = new THREE.BoxGeometry();
 const material = new THREE.MeshBasicMaterial( { color: 0x44aa88 } );
-const player = new THREE.Mesh( geometry, material );
+const player = new THREE.Mesh( playerGeometry, material );
 player.position.y = -1 * (window.innerHeight / 2) / 100;
 player.position.z = -5;
 scene.add( player );
 
+const shotGeometry = new THREE.BoxGeometry(0.1, 0.5, 0.1)
+const shot = new THREE.Mesh( shotGeometry,material);
 
-function movePlayer(e) {
+function shoot(){
+    const currentPosX = player.position.x/2;
+    const currentPosY = player.position.y/2;
+    shot.position.x = currentPosX;
+    shot.position.y = currentPosY;
+    scene.add(shot);
+}
+
+function keycodes(e) {
     switch( e.code ) {
         case "ArrowUp":	
             player.position.y += 0.5;
@@ -46,14 +56,18 @@ function movePlayer(e) {
         case "KeyD":	
             player.position.x += 0.5;
             break;
+        case "Space":
+            shoot();
+            break
     }
 }
 
 function animate() {
 	requestAnimationFrame( animate );
+    shot.position.y += 0.1
 	renderer.render( scene, camera );
 }
 animate();
 
 
-document.addEventListener("keydown", movePlayer, false)
+document.addEventListener("keydown", keycodes, false);
