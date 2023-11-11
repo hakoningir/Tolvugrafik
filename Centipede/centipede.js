@@ -19,15 +19,22 @@ player.position.y = -1 * (window.innerHeight / 2) / 100;
 player.position.z = -5;
 scene.add( player );
 
-const shotGeometry = new THREE.BoxGeometry(0.1, 0.5, 0.1)
-const shot = new THREE.Mesh( shotGeometry,material);
-
+const shotArray = []
 function shoot(){
+    const shotGeometry = new THREE.BoxGeometry(0.1, 0.5, 0.1)
+    const shot = new THREE.Mesh( shotGeometry,material);
     const currentPosX = player.position.x/2;
-    const currentPosY = player.position.y/2;
+    const currentPosY = (player.position.y/2)+0.2;
     shot.position.x = currentPosX;
     shot.position.y = currentPosY;
+    shotArray.push(shot)
     scene.add(shot);
+}
+
+function shotMovement(){
+    shotArray.forEach(shot => {
+        shot.position.y +=  0.05
+    });
 }
 
 function keycodes(e) {
@@ -64,7 +71,7 @@ function keycodes(e) {
 
 function animate() {
 	requestAnimationFrame( animate );
-    shot.position.y += 0.1
+    shotMovement();
 	renderer.render( scene, camera );
 }
 animate();
