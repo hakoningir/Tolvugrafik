@@ -61,14 +61,27 @@ function collisionDetection(){
     return false;
 }
 
-function centipede(){
-    const centihead = new THREE.SphereGeometry(0.2, 64, 32);
-    let centibody;
-    for(let i = 0; i < 8; i++){
-        centibody = new THREE.SphereGeometry(0.2, 64, 32);
-        centibody.position.x = 0.2*i;
+function centipedeHead(){
+    const centigeo = new THREE.SphereGeometry(0.2, 64, 32);
+    const material = new THREE.MeshBasicMaterial({color: 0xffff});
+    const centihead = new THREE.Mesh( centigeo, material);
+    centihead.position.x -= 2.5
+    centihead.position.y += 2.5 
+    scene.add(centihead);
+}
+centipedeHead();
+
+function centipedeBody(){
+    const centigeo = new THREE.SphereGeometry(0.2, 64, 32);
+    const material = new THREE.MeshBasicMaterial({color: 0xffff});
+    for(let i = 0; i < 5; i++){
+        const centibody = new THREE.Mesh( centigeo, material);
+        centibody.position.x -= 2.5 - i*0.4;
+        centibody.position.y += 2.5; 
+        scene.add(centibody);
     }
 }
+centipedeBody();
 
 function keycodes(e){
     switch( e.code ) {
