@@ -1,54 +1,51 @@
-// Ná í striga
 const canvas = document.querySelector('#c');
 
-// Skilgreina sviðsnet
 const scene = new THREE.Scene();
-            
-// Skilgreina myndavél og staðsetja hana
 const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-camera.position.set(0, 0, 10); // Adjust the distance as needed
+camera.position.set(0, 0, 10);
 
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Adjust intensity as needed
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
 scene.add(ambientLight);
 
-// Skilgreina birtingaraðferð
-const renderer = new THREE.WebGLRenderer({canvas});
+const renderer = new THREE.WebGLRenderer({ canvas });
 
-// Búa til tening með grunnáferð (basic material) og bæta í sviðsnetið
 const playerGeometry = new THREE.BoxGeometry();
-const material = new THREE.MeshBasicMaterial( { color: 0x44aa88 } );
-const player = new THREE.Mesh( playerGeometry, material );
+const material = new THREE.MeshBasicMaterial({ color: 0x44aa88 });
+const shotMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+const player = new THREE.Mesh(playerGeometry, material);
 player.position.y = -1 * (window.innerHeight / 2) / 100;
 player.position.z = -5;
-scene.add( player );
+scene.add(player);
 
-const shotArray = []
+const shotArray = [];
+
+
 function shoot() {
     const shotGeometry = new THREE.BoxGeometry(0.1, 0.5, 0.1);
-    const shot = new THREE.Mesh(shotGeometry, material);
+    const shot = new THREE.Mesh(shotGeometry, shotMaterial);
 
-    // Set initial position of the shot in the xy-plane
+    // Set initial position of the shot in the xy-plane and away from the player
     shot.position.x = player.position.x;
     shot.position.y = player.position.y + 0.2;
-    shot.position.z = player.position.z;
+    shot.position.z = player.position.z + 2; // Adjust th e initial distance away from the player
+
+    // Set the rotation of the shot to be horizontal
+    shot.rotation.set(Math.PI/2, 0, 0 );
 
     shotArray.push(shot);
     scene.add(shot);
 }
 
+
 function shotMovement() {
     shotArray.forEach(shot => {
-        const speed = 0.1; // Adjust this value for the shot's speed
-        const playerRotation = player.rotation.y;
+        const speed = 0.2;
 
-        // Move the shot in the xy-plane based on the player's rotation
-        shot.position.x -= Math.sin(playerRotation) * speed;
-        shot.position.y += Math.cos(playerRotation) * speed;
-
-        // You can adjust the z-axis movement if needed
-        shot.position.z += 0.05;
+        // Move the shot straight ahead in the positive z-axis direction
+        shot.position.z += speed;
     });
 }
+
 
 function keycodes(e) {
     switch( e.code ) {
