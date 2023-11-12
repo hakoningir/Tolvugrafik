@@ -21,7 +21,7 @@ scene.add( player );
 
 const shotArray = []
 function shoot(){
-    const shotGeometry = new THREE.BoxGeometry(0.1, 0.5, 0.1)
+    const shotGeometry = new THREE.BoxGeometry(0.05, 0.3, 0.1)
     const shot = new THREE.Mesh( shotGeometry,material);
     const currentPosX = player.position.x/2;
     const currentPosY = (player.position.y/2)+0.2;
@@ -54,14 +54,23 @@ function collisionDetection(){
                 shots.position.x - 0.1 <= teemo.position.x + 0.1 &&
                 shots.position.x + 0.1 >= teemo.position.x - 0.1 ){
                 scene.remove(shots)
-                return true; //þarf að laga þetta
+                return true;
             }
         });
     });
     return false;
 }
 
-function keycodes(e) {
+function centipede(){
+    const centihead = new THREE.SphereGeometry(0.2, 64, 32);
+    let centibody;
+    for(let i = 0; i < 8; i++){
+        centibody = new THREE.SphereGeometry(0.2, 64, 32);
+        centibody.position.x = 0.2*i;
+    }
+}
+
+function keycodes(e){
     switch( e.code ) {
         case "ArrowUp":	
             player.position.y += 0.4;
