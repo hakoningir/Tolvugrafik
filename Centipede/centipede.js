@@ -49,9 +49,11 @@ function teemoShrooms(){
 function collisionDetection(){
     shotArray.forEach(shots => {
         allTeemoShrooms.forEach(teemo => {
-            if( shots.position.y == teemo.position.y &&
-                shots.position.x == teemo.position.x){
-                    scene.remove(shots)
+            if( shots.position.y - 0.1 <= teemo.position.y + 0.1 &&
+                shots.position.y + 0.1 >= teemo.position.y - 0.1 &&
+                shots.position.x - 0.1 <= teemo.position.x + 0.1 &&
+                shots.position.x + 0.1 >= teemo.position.x - 0.1 ){
+                scene.remove(shots)
                 return true; //þarf að laga þetta
             }
         });
@@ -94,7 +96,7 @@ teemoShrooms()
 function animate() {
     requestAnimationFrame( animate );
     shotMovement();
-    collisionDetection;
+    collisionDetection();
     renderer.render( scene, camera );
 }
 animate();
