@@ -20,6 +20,7 @@ scene.add(player);
 const shotArray = [];
 
 
+
 function shoot() {
     const shotGeometry = new THREE.BoxGeometry(0.1, 0.5, 0.1);
     const shot = new THREE.Mesh(shotGeometry, shotMaterial);
@@ -46,16 +47,6 @@ function shotMovement() {
     });
 }
 
-
-const allTeemoShrooms = [];
-function teemoShrooms(){
-    const shroomGeometry = new THREE.SphereGeometry(0.2, 64, 32);
-    const material = new THREE.MeshBasicMaterial({color: 0xffff00});
-    const teemo = new THREE.Mesh( shroomGeometry, material);
-    allTeemoShrooms.push(teemo);
-    scene.add(teemo);
-}
-
 function collisionDetection(){
     shotArray.forEach(shots => {
         allTeemoShrooms.forEach(teemo => {
@@ -68,7 +59,6 @@ function collisionDetection(){
             }
         });
     });
-    return false;
 }
 
 let centiArray = []
@@ -123,6 +113,8 @@ function keycodes(e){
             break
     }
 }
+
+
 function animate() {
     requestAnimationFrame(animate);
     
@@ -140,6 +132,7 @@ function animate() {
     shotMovement();
     renderer.render(scene, camera);
 }
+
 animate();
 teemoShrooms()
 
